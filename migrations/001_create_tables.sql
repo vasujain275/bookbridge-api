@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- users table
@@ -105,3 +106,13 @@ CREATE INDEX idx_loans_user_id ON loans(user_id);
 CREATE INDEX idx_loans_book_id ON loans(book_id);
 CREATE INDEX idx_book_reviews_book_id ON book_reviews(book_id);
 CREATE INDEX idx_book_reviews_user_id ON book_reviews(user_id);
+
+-- +goose Down
+DROP TABLE IF EXISTS book_reviews;
+DROP TABLE IF EXISTS loans;
+DROP TABLE IF EXISTS book_categories;
+DROP TABLE IF EXISTS book_authors;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS authors;
+DROP TABLE IF EXISTS books;
+DROP TABLE IF EXISTS users;

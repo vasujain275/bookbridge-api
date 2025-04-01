@@ -30,8 +30,8 @@ func Load() (*Config, error) {
 		DBHost:      getEnv("DB_HOST", "localhost"),
 		DBPort:      getEnv("DB_PORT", "5432"),
 		DBUser:      getEnv("DB_USER", "postgres"),
-		DBPassword:  getEnv("DB_PASSWORD", "postgres"),
-		DBName:      getEnv("DB_NAME", "library_db"),
+		DBPassword:  getEnv("DB_PASSWORD", "postgres123"),
+		DBName:      getEnv("DB_NAME", "bookbridgeDB"),
 		DBSSLMode:   getEnv("DB_SSLMODE", "disable"),
 		Environment: getEnv("ENVIRONMENT", "development"),
 	}

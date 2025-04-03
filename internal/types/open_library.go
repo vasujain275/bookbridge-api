@@ -11,6 +11,7 @@ type OpenLibraryBook struct {
 		Key string `json:"key,omitempty"`
 	} `json:"authors,omitempty"`
 	PublishDate   string   `json:"publish_date,omitempty"`
+	Bio           string   `json:"bio,omitempty"`
 	Publishers    []string `json:"publishers,omitempty"`
 	Covers        []int    `json:"covers,omitempty"`
 	Contributions []string `json:"contributions,omitempty"`

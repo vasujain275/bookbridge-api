@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/vasujain275/bookbridge-api/internal/repository"
+	"github.com/vasujain275/bookbridge-api/internal/types"
 )
 
 // UserService defines the interface for user operations
@@ -22,18 +23,17 @@ type UserService interface {
 // BookService defines the interface for book operations
 type BookService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*repository.Book, error)
-	GetByGoogleID(ctx context.Context, googleID string) (*repository.Book, error)
+	GetByISBN(ctx context.Context, isbn string) (*repository.Book, error)
 	List(ctx context.Context, limit, offset int32) ([]*repository.Book, error)
-	Search(ctx context.Context, query string, limit, offset int32) ([]*repository.Book, error)
-	Create(ctx context.Context, params repository.CreateBookParams) (*repository.Book, error)
-	Update(ctx context.Context, params repository.UpdateBookParams) (*repository.Book, error)
-	UpdateCopies(ctx context.Context, params repository.UpdateBookCopiesParams) (*repository.Book, error)
-	Delete(ctx context.Context, id uuid.UUID) error
-	GetFullBookDetails(ctx context.Context, id uuid.UUID) (*BookDetails, error)
+	Create(ctx context.Context, isbn string) (*repository.Book, error)
+	// Update(ctx context.Context, params repository.UpdateBookParams) (*repository.Book, error)
+	// UpdateCopies(ctx context.Context, params repository.UpdateBookCopiesParams) (*repository.Book, error)
+	// Delete(ctx context.Context, id uuid.UUID) error
+	// GetFullBookDetails(ctx context.Context, id uuid.UUID) (*BookDetails, error)
 }
 
 type OpenLibraryService interface {
-	GetByISBN(ctx context.Context, isbn string) (*types.OpenLibraryBook, error)
+	GetByISBN(isbn string) (*types.OpenLibraryBook, error)
 }
 
 // AuthorService defines the interface for author operations

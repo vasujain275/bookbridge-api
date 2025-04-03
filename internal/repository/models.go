@@ -27,7 +27,7 @@ type Author struct {
 type Book struct {
 	ID              uuid.UUID        `json:"id"`
 	Isbn10          pgtype.Text      `json:"isbn_10"`
-	Isbn13          pgtype.Text      `json:"isbn_13"`
+	Isbn13          string           `json:"isbn_13"`
 	Title           string           `json:"title"`
 	Publisher       pgtype.Text      `json:"publisher"`
 	PublishedDate   pgtype.Text      `json:"published_date"`

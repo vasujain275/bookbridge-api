@@ -45,6 +45,8 @@ func main() {
 
 	// Initialize services
 	userService := service.NewUserService(repo)
+	openLibraryService := service.NewOpenLibraryService()
+	bookService := service.NewBookService(repo, openLibraryService)
 
 	// Initialize router
 	router := gin.Default()
@@ -64,6 +66,16 @@ func main() {
 		userRoutes.POST("", userHandler.CreateUser)       // POST /users
 		userRoutes.PUT("/:id", userHandler.UpdateUser)    // PUT /users/{id}
 		userRoutes.DELETE("/:id", userHandler.DeleteUser) // DELETE /users/{id}
+	}
+
+	// Register book routes
+	bookHandler := handler.NewBookHandler(bookService)
+	bookRoutes := router.Group("/books")
+	{
+		bookRoutes.GET("/:id", bookHandler.GetBook)              // GET /books/{id}
+		bookRoutes.GET("", bookHandler.ListBooks)                // GET /books?limit=&offset=
+		bookRoutes.POST("", bookHandler.CreateBook)              // POST /books
+		bookRoutes.GET("/isbn/:isbn", bookHandler.GetBookByISBN) // GET /books/isbn/{isbn}
 	}
 
 	// Create server

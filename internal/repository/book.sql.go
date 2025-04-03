@@ -25,7 +25,7 @@ RETURNING id, isbn_10, isbn_13, title, publisher, published_date, description, p
 
 type CreateBookParams struct {
 	Isbn10          pgtype.Text `json:"isbn_10"`
-	Isbn13          pgtype.Text `json:"isbn_13"`
+	Isbn13          string      `json:"isbn_13"`
 	Title           string      `json:"title"`
 	Publisher       pgtype.Text `json:"publisher"`
 	PublishedDate   pgtype.Text `json:"published_date"`
@@ -88,6 +88,33 @@ WHERE id = $1
 
 func (q *Queries) GetBook(ctx context.Context, id uuid.UUID) (Book, error) {
 	row := q.db.QueryRow(ctx, getBook, id)
+	var i Book
+	err := row.Scan(
+		&i.ID,
+		&i.Isbn10,
+		&i.Isbn13,
+		&i.Title,
+		&i.Publisher,
+		&i.PublishedDate,
+		&i.Description,
+		&i.PageCount,
+		&i.Language,
+		&i.ThumbnailUrl,
+		&i.TotalCopies,
+		&i.AvailableCopies,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getBookByISBN = `-- name: GetBookByISBN :one
+SELECT id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at FROM books
+WHERE isbn_13 = $1
+`
+
+func (q *Queries) GetBookByISBN(ctx context.Context, isbn13 string) (Book, error) {
+	row := q.db.QueryRow(ctx, getBookByISBN, isbn13)
 	var i Book
 	err := row.Scan(
 		&i.ID,
@@ -227,7 +254,7 @@ RETURNING id, isbn_10, isbn_13, title, publisher, published_date, description, p
 type UpdateBookParams struct {
 	ID              uuid.UUID   `json:"id"`
 	Isbn10          pgtype.Text `json:"isbn_10"`
-	Isbn13          pgtype.Text `json:"isbn_13"`
+	Isbn13          string      `json:"isbn_13"`
 	Title           string      `json:"title"`
 	Publisher       pgtype.Text `json:"publisher"`
 	PublishedDate   pgtype.Text `json:"published_date"`

@@ -1,4 +1,11 @@
 definitions:
+  handler.CreateBookRequest:
+    properties:
+      isbn:
+        type: string
+    required:
+    - isbn
+    type: object
   handler.CreateUserRequest:
     properties:
       email:
@@ -44,6 +51,127 @@ definitions:
 info:
   contact: {}
 paths:
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of books with pagination.
+      parameters:
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Books retrieved successfully
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: List books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Create a new book by fetching details from OpenLibrary using ISBN
+      parameters:
+      - description: Book ISBN
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Book created successfully
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Create a new book
+      tags:
+      - books
+  /books/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a book by its ID.
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book found
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Invalid ID supplied
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Book not found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Get book by ID
+      tags:
+      - books
+  /books/isbn/{isbn}:
+    get:
+      consumes:
+      - application/json
+      description: Get a book by its ISBN.
+      parameters:
+      - description: Book ISBN
+        in: path
+        name: isbn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book found
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Invalid ISBN supplied
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Book not found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Get book by ISBN
+      tags:
+      - books
   /users:
     get:
       consumes:

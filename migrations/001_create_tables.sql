@@ -17,7 +17,6 @@ CREATE TABLE users (
 -- books table
 CREATE TABLE books (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  google_book_id VARCHAR UNIQUE NOT NULL,
   isbn_10 VARCHAR,
   isbn_13 VARCHAR,
   title VARCHAR NOT NULL,
@@ -37,6 +36,14 @@ CREATE TABLE books (
 CREATE TABLE authors (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR UNIQUE NOT NULL,
+  bio TEXT,
+  openlibrary_key VARCHAR,  -- To store the key from the Open Library response (e.g. "/authors/OL34184A")
+  photos JSONB,            -- To store the list of photo IDs (as provided by Open Library)
+  alternate_names JSONB,   -- To store alternate names from the response
+  personal_name VARCHAR,   -- To store the personal name field
+  links JSONB,             -- To store the list of links (each link as an object with title and url)
+  birth_date DATE,         -- For storing birth date (requires conversion from text to date)
+  death_date DATE,         -- For storing death date (requires conversion from text to date)
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

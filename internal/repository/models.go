@@ -10,15 +10,22 @@ import (
 )
 
 type Author struct {
-	ID        uuid.UUID        `json:"id"`
-	Name      string           `json:"name"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
-	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+	ID             uuid.UUID        `json:"id"`
+	Name           string           `json:"name"`
+	Bio            pgtype.Text      `json:"bio"`
+	OpenlibraryKey pgtype.Text      `json:"openlibrary_key"`
+	Photos         []byte           `json:"photos"`
+	AlternateNames []byte           `json:"alternate_names"`
+	PersonalName   pgtype.Text      `json:"personal_name"`
+	Links          []byte           `json:"links"`
+	BirthDate      pgtype.Date      `json:"birth_date"`
+	DeathDate      pgtype.Date      `json:"death_date"`
+	CreatedAt      pgtype.Timestamp `json:"created_at"`
+	UpdatedAt      pgtype.Timestamp `json:"updated_at"`
 }
 
 type Book struct {
 	ID              uuid.UUID        `json:"id"`
-	GoogleBookID    string           `json:"google_book_id"`
 	Isbn10          pgtype.Text      `json:"isbn_10"`
 	Isbn13          pgtype.Text      `json:"isbn_13"`
 	Title           string           `json:"title"`

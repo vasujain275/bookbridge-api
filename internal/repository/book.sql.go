@@ -14,17 +14,16 @@ import (
 
 const createBook = `-- name: CreateBook :one
 INSERT INTO books (
-  google_book_id, isbn_10, isbn_13, title, publisher,
+  isbn_10, isbn_13, title, publisher,
   published_date, description, page_count, language,
   thumbnail_url, total_copies, available_copies
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
 )
-RETURNING id, google_book_id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at
+RETURNING id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at
 `
 
 type CreateBookParams struct {
-	GoogleBookID    string      `json:"google_book_id"`
 	Isbn10          pgtype.Text `json:"isbn_10"`
 	Isbn13          pgtype.Text `json:"isbn_13"`
 	Title           string      `json:"title"`
@@ -40,7 +39,6 @@ type CreateBookParams struct {
 
 func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, error) {
 	row := q.db.QueryRow(ctx, createBook,
-		arg.GoogleBookID,
 		arg.Isbn10,
 		arg.Isbn13,
 		arg.Title,
@@ -56,7 +54,6 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 	var i Book
 	err := row.Scan(
 		&i.ID,
-		&i.GoogleBookID,
 		&i.Isbn10,
 		&i.Isbn13,
 		&i.Title,
@@ -85,7 +82,7 @@ func (q *Queries) DeleteBook(ctx context.Context, id uuid.UUID) error {
 }
 
 const getBook = `-- name: GetBook :one
-SELECT id, google_book_id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at FROM books
+SELECT id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at FROM books
 WHERE id = $1
 `
 
@@ -94,35 +91,6 @@ func (q *Queries) GetBook(ctx context.Context, id uuid.UUID) (Book, error) {
 	var i Book
 	err := row.Scan(
 		&i.ID,
-		&i.GoogleBookID,
-		&i.Isbn10,
-		&i.Isbn13,
-		&i.Title,
-		&i.Publisher,
-		&i.PublishedDate,
-		&i.Description,
-		&i.PageCount,
-		&i.Language,
-		&i.ThumbnailUrl,
-		&i.TotalCopies,
-		&i.AvailableCopies,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const getBookByGoogleId = `-- name: GetBookByGoogleId :one
-SELECT id, google_book_id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at FROM books
-WHERE google_book_id = $1
-`
-
-func (q *Queries) GetBookByGoogleId(ctx context.Context, googleBookID string) (Book, error) {
-	row := q.db.QueryRow(ctx, getBookByGoogleId, googleBookID)
-	var i Book
-	err := row.Scan(
-		&i.ID,
-		&i.GoogleBookID,
 		&i.Isbn10,
 		&i.Isbn13,
 		&i.Title,
@@ -141,7 +109,7 @@ func (q *Queries) GetBookByGoogleId(ctx context.Context, googleBookID string) (B
 }
 
 const listBooks = `-- name: ListBooks :many
-SELECT id, google_book_id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at FROM books
+SELECT id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at FROM books
 ORDER BY title
 LIMIT $1 OFFSET $2
 `
@@ -162,7 +130,6 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 		var i Book
 		if err := rows.Scan(
 			&i.ID,
-			&i.GoogleBookID,
 			&i.Isbn10,
 			&i.Isbn13,
 			&i.Title,
@@ -188,7 +155,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 }
 
 const searchBooks = `-- name: SearchBooks :many
-SELECT id, google_book_id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at FROM books
+SELECT id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at FROM books
 WHERE 
   title ILIKE '%' || $1 || '%'
   OR publisher ILIKE '%' || $1 || '%'
@@ -214,7 +181,6 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 		var i Book
 		if err := rows.Scan(
 			&i.ID,
-			&i.GoogleBookID,
 			&i.Isbn10,
 			&i.Isbn13,
 			&i.Title,
@@ -242,26 +208,24 @@ func (q *Queries) SearchBooks(ctx context.Context, arg SearchBooksParams) ([]Boo
 const updateBook = `-- name: UpdateBook :one
 UPDATE books
 SET 
-  google_book_id = $2,
-  isbn_10 = $3,
-  isbn_13 = $4,
-  title = $5,
-  publisher = $6,
-  published_date = $7,
-  description = $8,
-  page_count = $9,
-  language = $10,
-  thumbnail_url = $11,
-  total_copies = $12,
-  available_copies = $13,
+  isbn_10 = $2,
+  isbn_13 = $3,
+  title = $4,
+  publisher = $5,
+  published_date = $6,
+  description = $7,
+  page_count = $8,
+  language = $9,
+  thumbnail_url = $10,
+  total_copies = $11,
+  available_copies = $12,
   updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
-RETURNING id, google_book_id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at
+RETURNING id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at
 `
 
 type UpdateBookParams struct {
 	ID              uuid.UUID   `json:"id"`
-	GoogleBookID    string      `json:"google_book_id"`
 	Isbn10          pgtype.Text `json:"isbn_10"`
 	Isbn13          pgtype.Text `json:"isbn_13"`
 	Title           string      `json:"title"`
@@ -278,7 +242,6 @@ type UpdateBookParams struct {
 func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error) {
 	row := q.db.QueryRow(ctx, updateBook,
 		arg.ID,
-		arg.GoogleBookID,
 		arg.Isbn10,
 		arg.Isbn13,
 		arg.Title,
@@ -294,7 +257,6 @@ func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, e
 	var i Book
 	err := row.Scan(
 		&i.ID,
-		&i.GoogleBookID,
 		&i.Isbn10,
 		&i.Isbn13,
 		&i.Title,
@@ -319,7 +281,7 @@ SET
   available_copies = $3,
   updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
-RETURNING id, google_book_id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at
+RETURNING id, isbn_10, isbn_13, title, publisher, published_date, description, page_count, language, thumbnail_url, total_copies, available_copies, created_at, updated_at
 `
 
 type UpdateBookCopiesParams struct {
@@ -333,7 +295,6 @@ func (q *Queries) UpdateBookCopies(ctx context.Context, arg UpdateBookCopiesPara
 	var i Book
 	err := row.Scan(
 		&i.ID,
-		&i.GoogleBookID,
 		&i.Isbn10,
 		&i.Isbn13,
 		&i.Title,

@@ -12,14 +12,25 @@ ORDER BY name
 LIMIT $1 OFFSET $2;
 
 -- name: CreateAuthor :one
-INSERT INTO authors (name)
-VALUES ($1)
+INSERT INTO authors (
+  name, bio, openlibrary_key, photos, alternate_names, personal_name, links, birth_date, death_date
+) VALUES (
+  $1, $2, $3, $4, $5, $6, $7, $8, $9
+)
 RETURNING *;
 
 -- name: UpdateAuthor :one
 UPDATE authors
 SET 
   name = $2,
+  bio = $3,
+  openlibrary_key = $4,
+  photos = $5,
+  alternate_names = $6,
+  personal_name = $7,
+  links = $8,
+  birth_date = $9,
+  death_date = $10,
   updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
 RETURNING *;

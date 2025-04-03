@@ -13,6 +13,7 @@ run: build
 # Start development mode using Air for live reload
 dev:
 	@echo "Starting development mode with Air..."
+	@swag init -g cmd/api/main.go
 	@air
 
 # Generate Swagger docs; ensure swag is installed: go install github.com/swaggo/swag/cmd/swag@latest

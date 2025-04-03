@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const addBookAuthor = `-- name: AddBookAuthor :exec
@@ -30,17 +31,50 @@ func (q *Queries) AddBookAuthor(ctx context.Context, arg AddBookAuthorParams) er
 }
 
 const createAuthor = `-- name: CreateAuthor :one
-INSERT INTO authors (name)
-VALUES ($1)
-RETURNING id, name, created_at, updated_at
+INSERT INTO authors (
+  name, bio, openlibrary_key, photos, alternate_names, personal_name, links, birth_date, death_date
+) VALUES (
+  $1, $2, $3, $4, $5, $6, $7, $8, $9
+)
+RETURNING id, name, bio, openlibrary_key, photos, alternate_names, personal_name, links, birth_date, death_date, created_at, updated_at
 `
 
-func (q *Queries) CreateAuthor(ctx context.Context, name string) (Author, error) {
-	row := q.db.QueryRow(ctx, createAuthor, name)
+type CreateAuthorParams struct {
+	Name           string      `json:"name"`
+	Bio            pgtype.Text `json:"bio"`
+	OpenlibraryKey pgtype.Text `json:"openlibrary_key"`
+	Photos         []byte      `json:"photos"`
+	AlternateNames []byte      `json:"alternate_names"`
+	PersonalName   pgtype.Text `json:"personal_name"`
+	Links          []byte      `json:"links"`
+	BirthDate      pgtype.Date `json:"birth_date"`
+	DeathDate      pgtype.Date `json:"death_date"`
+}
+
+func (q *Queries) CreateAuthor(ctx context.Context, arg CreateAuthorParams) (Author, error) {
+	row := q.db.QueryRow(ctx, createAuthor,
+		arg.Name,
+		arg.Bio,
+		arg.OpenlibraryKey,
+		arg.Photos,
+		arg.AlternateNames,
+		arg.PersonalName,
+		arg.Links,
+		arg.BirthDate,
+		arg.DeathDate,
+	)
 	var i Author
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.Bio,
+		&i.OpenlibraryKey,
+		&i.Photos,
+		&i.AlternateNames,
+		&i.PersonalName,
+		&i.Links,
+		&i.BirthDate,
+		&i.DeathDate,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -58,7 +92,7 @@ func (q *Queries) DeleteAuthor(ctx context.Context, id uuid.UUID) error {
 }
 
 const getAuthor = `-- name: GetAuthor :one
-SELECT id, name, created_at, updated_at FROM authors
+SELECT id, name, bio, openlibrary_key, photos, alternate_names, personal_name, links, birth_date, death_date, created_at, updated_at FROM authors
 WHERE id = $1
 `
 
@@ -68,6 +102,14 @@ func (q *Queries) GetAuthor(ctx context.Context, id uuid.UUID) (Author, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.Bio,
+		&i.OpenlibraryKey,
+		&i.Photos,
+		&i.AlternateNames,
+		&i.PersonalName,
+		&i.Links,
+		&i.BirthDate,
+		&i.DeathDate,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -75,7 +117,7 @@ func (q *Queries) GetAuthor(ctx context.Context, id uuid.UUID) (Author, error) {
 }
 
 const getAuthorByName = `-- name: GetAuthorByName :one
-SELECT id, name, created_at, updated_at FROM authors
+SELECT id, name, bio, openlibrary_key, photos, alternate_names, personal_name, links, birth_date, death_date, created_at, updated_at FROM authors
 WHERE name = $1
 `
 
@@ -85,6 +127,14 @@ func (q *Queries) GetAuthorByName(ctx context.Context, name string) (Author, err
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.Bio,
+		&i.OpenlibraryKey,
+		&i.Photos,
+		&i.AlternateNames,
+		&i.PersonalName,
+		&i.Links,
+		&i.BirthDate,
+		&i.DeathDate,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -92,7 +142,7 @@ func (q *Queries) GetAuthorByName(ctx context.Context, name string) (Author, err
 }
 
 const listAuthors = `-- name: ListAuthors :many
-SELECT id, name, created_at, updated_at FROM authors
+SELECT id, name, bio, openlibrary_key, photos, alternate_names, personal_name, links, birth_date, death_date, created_at, updated_at FROM authors
 ORDER BY name
 LIMIT $1 OFFSET $2
 `
@@ -114,6 +164,14 @@ func (q *Queries) ListAuthors(ctx context.Context, arg ListAuthorsParams) ([]Aut
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.Bio,
+			&i.OpenlibraryKey,
+			&i.Photos,
+			&i.AlternateNames,
+			&i.PersonalName,
+			&i.Links,
+			&i.BirthDate,
+			&i.DeathDate,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -128,7 +186,7 @@ func (q *Queries) ListAuthors(ctx context.Context, arg ListAuthorsParams) ([]Aut
 }
 
 const listAuthorsByBookID = `-- name: ListAuthorsByBookID :many
-SELECT a.id, a.name, a.created_at, a.updated_at FROM authors a
+SELECT a.id, a.name, a.bio, a.openlibrary_key, a.photos, a.alternate_names, a.personal_name, a.links, a.birth_date, a.death_date, a.created_at, a.updated_at FROM authors a
 JOIN book_authors ba ON a.id = ba.author_id
 WHERE ba.book_id = $1
 ORDER BY a.name
@@ -146,6 +204,14 @@ func (q *Queries) ListAuthorsByBookID(ctx context.Context, bookID uuid.UUID) ([]
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.Bio,
+			&i.OpenlibraryKey,
+			&i.Photos,
+			&i.AlternateNames,
+			&i.PersonalName,
+			&i.Links,
+			&i.BirthDate,
+			&i.DeathDate,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -188,22 +254,57 @@ const updateAuthor = `-- name: UpdateAuthor :one
 UPDATE authors
 SET 
   name = $2,
+  bio = $3,
+  openlibrary_key = $4,
+  photos = $5,
+  alternate_names = $6,
+  personal_name = $7,
+  links = $8,
+  birth_date = $9,
+  death_date = $10,
   updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
-RETURNING id, name, created_at, updated_at
+RETURNING id, name, bio, openlibrary_key, photos, alternate_names, personal_name, links, birth_date, death_date, created_at, updated_at
 `
 
 type UpdateAuthorParams struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
+	ID             uuid.UUID   `json:"id"`
+	Name           string      `json:"name"`
+	Bio            pgtype.Text `json:"bio"`
+	OpenlibraryKey pgtype.Text `json:"openlibrary_key"`
+	Photos         []byte      `json:"photos"`
+	AlternateNames []byte      `json:"alternate_names"`
+	PersonalName   pgtype.Text `json:"personal_name"`
+	Links          []byte      `json:"links"`
+	BirthDate      pgtype.Date `json:"birth_date"`
+	DeathDate      pgtype.Date `json:"death_date"`
 }
 
 func (q *Queries) UpdateAuthor(ctx context.Context, arg UpdateAuthorParams) (Author, error) {
-	row := q.db.QueryRow(ctx, updateAuthor, arg.ID, arg.Name)
+	row := q.db.QueryRow(ctx, updateAuthor,
+		arg.ID,
+		arg.Name,
+		arg.Bio,
+		arg.OpenlibraryKey,
+		arg.Photos,
+		arg.AlternateNames,
+		arg.PersonalName,
+		arg.Links,
+		arg.BirthDate,
+		arg.DeathDate,
+	)
 	var i Author
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.Bio,
+		&i.OpenlibraryKey,
+		&i.Photos,
+		&i.AlternateNames,
+		&i.PersonalName,
+		&i.Links,
+		&i.BirthDate,
+		&i.DeathDate,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

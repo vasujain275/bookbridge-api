@@ -17,8 +17,8 @@ CREATE TABLE users (
 -- books table
 CREATE TABLE books (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  isbn_10 VARCHAR,
-  isbn_13 VARCHAR,
+  isbn_10 VARCHAR UNIQUE,
+  isbn_13 VARCHAR UNIQUE NOT NULL,
   title VARCHAR NOT NULL,
   publisher VARCHAR,
   published_date VARCHAR,

@@ -2,6 +2,10 @@
 SELECT * FROM books
 WHERE id = $1;
 
+-- name: GetBookByISBN :one
+SELECT * FROM books
+WHERE isbn_13 = $1;
+
 -- name: ListBooks :many
 SELECT * FROM books
 ORDER BY title

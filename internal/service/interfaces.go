@@ -32,6 +32,10 @@ type BookService interface {
 	GetFullBookDetails(ctx context.Context, id uuid.UUID) (*BookDetails, error)
 }
 
+type OpenLibraryService interface {
+	GetByISBN(ctx context.Context, isbn string) (*types.OpenLibraryBook, error)
+}
+
 // AuthorService defines the interface for author operations
 type AuthorService interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*repository.Author, error)

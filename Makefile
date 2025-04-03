@@ -1,7 +1,7 @@
 .PHONY: build run dev swag test clean
 
 # Build the application
-build:
+build: swag
 	@echo "Building the application..."
 	@go build -o bin/api cmd/api/main.go
 
@@ -11,9 +11,8 @@ run: build
 	@./bin/api
 
 # Start development mode using Air for live reload
-dev:
+dev: swag
 	@echo "Starting development mode with Air..."
-	@swag init -g cmd/api/main.go
 	@air
 
 # Generate Swagger docs; ensure swag is installed: go install github.com/swaggo/swag/cmd/swag@latest
@@ -22,7 +21,7 @@ swag:
 	@swag init -g cmd/api/main.go
 
 # Run tests
-test:
+test: swag
 	@echo "Running tests..."
 	@go test ./...
 
